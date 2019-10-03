@@ -1,6 +1,7 @@
 from Tokenizer import Tokenizer
 from writer import MKDocsWriter
 import json
+import jsonutils
 
 class Parser:
     def run(code, file, path):
@@ -101,14 +102,23 @@ class Parser:
             return data
         except FileNotFoundError as err:
             raise err
+    
+    def parseSchemaBody():
+        try:
+            file_path = Parser.tokens.actual.value
+            if Parser.tokens.actual.value[:2] == './':
+                file_path = Parser.tokens.actual.value[2:]
+            body = jsonutils.make_payload(Parser.path + file_path)
+            return body
+        except FileNotFoundError as err:
+            raise err
 
     def parseBody():
         body = {}
         Parser.file.write(Parser.writer.heading('Body parameters:', level=5))
         if Parser.tokens.actual.type == 'FILE':
             Parser.tokens.select_next()
-            body = Parser.parseSchema()
-            body = body['properties']
+            body = Parser.parseSchemaBody()
             Parser.file.write(Parser.writer.json_code(json.dumps(body)))
             return body
         while Parser.tokens.actual.type not in ['EOF', 'TITLE', 'SUB']:
