@@ -93,11 +93,14 @@ class Parser:
     
     def parseSchema():
         try:
-            with open(Parser.path + Parser.tokens.actual.value) as f:
+            file_path = Parser.tokens.actual.value
+            if Parser.tokens.actual.value[:2] == './':
+                file_path = Parser.tokens.actual.value[2:]
+            with open(Parser.path + file_path) as f:
                 data = json.load(f)
             return data
-        except FileNotFoundError:
-            raise FileNotFoundError(f'File from schema {Parser.tokens.actual.value} not found')
+        except FileNotFoundError as err:
+            raise err
 
     def parseBody():
         body = {}
@@ -111,7 +114,7 @@ class Parser:
         while Parser.tokens.actual.type not in ['EOF', 'TITLE', 'SUB']:
             key = Parser.tokens.actual
             Parser.tokens.select_next()
-            if Parser.tokens.actual != '-':
+            if Parser.tokens.actual.type != 'SEPARATOR':
                 raise SyntaxError(f'Missing - between key and value for body, instead got {Parser.tokens.actual.value}')
             Parser.tokens.select_next()
             value = []
@@ -121,7 +124,7 @@ class Parser:
             value.append(Parser.tokens.actual.value)
             value = ' '.join(value)
             Parser.tokens.select_next()
-            body[key] = value
+            body[key.value] = value
         Parser.file.write(Parser.writer.json_code(json.dumps(body)))
         return body
     

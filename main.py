@@ -4,11 +4,11 @@ import json
 import re
 import sys
 
+sys.path.append('./lib')
 from Parser import Parser
 from Tokenizer import Tokenizer
 from writer import MKDocsWriter
 
-sys.path.append('./lib')
 
 
 def stripRoute(docstring):
@@ -56,7 +56,7 @@ if __name__ == '__main__':
                 docstring = action.__doc__
                 if docstring is not None:
                     docstring = docstring.strip().split(' ')
-                    docstring = [d.split('\n')[0] for d in docstring if d != '']
+                    docstring = [d.split('\n')[0] for d in docstring if d not in ['', '\n']]
                     color_action_text = markdown.text_color(action.__name__.capitalize(), color=markdown.ACTION_COLOR[action.__name__])
                     file_out.write(markdown.heading(color_action_text, level=3))
                     Parser.run(docstring, file_out, path)
