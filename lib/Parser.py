@@ -143,38 +143,32 @@ class Parser:
             Parser.file.write(Parser.writer.heading(Parser.writer.text_color(f'Code: {actual}', color=color), level=5))
             key_reponse = str(actual)
             Parser.tokens.select_next()
+            body = {}
             if Parser.tokens.actual.type == 'FILE':
                 Parser.tokens.select_next()
                 body = Parser.parseSchema()
                 Parser.tokens.select_next()
                 response[key_reponse] = body
-                try:
-                    color = Parser.writer.RESPONSE_COLOR[str(actual)]
-                    Parser.file.write(Parser.writer.RESPONSE_NOTATION[str(actual)](Parser.writer.code(json.dumps(body))))
-                except KeyError:
-                    Parser.file.write(Parser.writer.failure(Parser.writer.code(json.dumps(body))))
-            else:
-                body = {}
-                while Parser.tokens.actual.type not in ['EOF', 'TITLE', 'SUB']:
-                    key = Parser.tokens.actual.value
-                    Parser.tokens.select_next()
-                    if Parser.tokens.actual.type != 'SEPARATOR':
-                        raise SyntaxError(f'Missing - between key and value for reponse, instead got {Parser.tokens.actual.value}')
-                    Parser.tokens.select_next()
-                    value = []
-                    while Parser.tokens.actual.type != 'ENDLINE':
-                        value.append(Parser.tokens.actual.value)
-                        Parser.tokens.select_next()
+            while Parser.tokens.actual.type not in ['EOF', 'TITLE', 'SUB']:
+                key = Parser.tokens.actual.value
+                Parser.tokens.select_next()
+                if Parser.tokens.actual.type != 'SEPARATOR':
+                    raise SyntaxError(f'Missing - between key and value for reponse, instead got {Parser.tokens.actual.value}')
+                Parser.tokens.select_next()
+                value = []
+                while Parser.tokens.actual.type != 'ENDLINE':
                     value.append(Parser.tokens.actual.value)
-                    value = ' '.join(value)
                     Parser.tokens.select_next()
-                    body[key] = value
-                response[key_reponse] = body
-                try:
-                    color = Parser.writer.RESPONSE_COLOR[str(actual)]
-                    Parser.file.write(Parser.writer.RESPONSE_NOTATION[str(actual)](Parser.writer.code(json.dumps(body))))
-                except KeyError:
-                    Parser.file.write(Parser.writer.failure(Parser.writer.code(json.dumps(body))))
+                value.append(Parser.tokens.actual.value)
+                value = ' '.join(value)
+                Parser.tokens.select_next()
+                body[key] = value
+            response[key_reponse] = body
+            try:
+                color = Parser.writer.RESPONSE_COLOR[str(actual)]
+                Parser.file.write(Parser.writer.RESPONSE_NOTATION[str(actual)](Parser.writer.code(json.dumps(body))))
+            except KeyError:
+                Parser.file.write(Parser.writer.failure(Parser.writer.code(json.dumps(body))))
         return response
                     
 
