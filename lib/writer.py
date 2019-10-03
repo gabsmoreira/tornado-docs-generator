@@ -3,7 +3,7 @@ class MKDocsWriter():
         super().__init__(*args, **kwargs)
         self.RESPONSE_COLOR = {'200': 'green'}
         self.RESPONSE_NOTATION = {'200': self.success}
-        self.ACTION_COLOR = {'get': 'green', 'post': 'orange', 'patch': 'yellow', 'delete': 'red'}
+        self.ACTION_COLOR = {'get': 'green', 'post': 'orange', 'patch': 'blue', 'delete': 'red'}
 
     
     def text(self, text):
